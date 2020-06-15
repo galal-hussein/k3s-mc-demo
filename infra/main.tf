@@ -47,7 +47,7 @@ resource "aws_instance" "k3s-demo" {
   security_groups = [
     aws_security_group.k3s.name,
   ]
-
+   user_data     = base64encode(templatefile("${path.module}/files/server_userdata.tmpl", {}))
    root_block_device {
     volume_size = "30"
     volume_type = "gp2"
