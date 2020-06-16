@@ -19,6 +19,11 @@ fatal()
 
 set -e
 
+if [ "$EUID" -ne 0 ]
+  then fatal "Please run as root"
+  exit
+fi
+
 if [ ! -d external_db ]; then
 	cp -r infra external_db
 fi
@@ -27,8 +32,8 @@ terraform init
 terraform apply --auto-approve --var 'instance_count=4' --var 'name=hgalaldemo3'
 ips=$(terraform output k3s_demo_ips)
 sleep 10
-sed -i -n '3,/#startdemo3/p;/#enddemo3/,$p' /etc/hosts
-sed -i '/#startdemo3/,/#enddemo3/d' /etc/hosts
+sed -i.bu -n '3,/#startdemo3/p;/#enddemo3/,$p' /etc/hosts
+sed -i.bu '/#startdemo3/,/#enddemo3/d' /etc/hosts
 echo "#startdemo3" >> /etc/hosts
 count=0
 echo 
@@ -36,7 +41,7 @@ info 'External DB HA'
 info '=================================================================='
 for i in `echo $ips | sed "s/,/ /g"`; do
 	echo "$i ${NAME_PREFIX}-${count}" >> /etc/hosts
-	ssh -i /home/hussein/.ssh/id_rsa -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" ubuntu@${NAME_PREFIX}-${count} "sudo hostnamectl set-hostname $NAME_PREFIX-${count}" 2> /dev/null &
+	ssh -i ~hussein/.ssh/id_rsa -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" ubuntu@${NAME_PREFIX}-${count} "sudo hostnamectl set-hostname $NAME_PREFIX-${count}" 2> /dev/null &
 	if [ $count -eq 0 ]; then
 		info "name: $NAME_PREFIX-$count, command to run: (docker run -d -p 3306:3306 -e MYSQL_ROOT_PASSWORD=k3spass mysql:5.7)"
 		MYSQL_IP=$i
