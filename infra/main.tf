@@ -42,7 +42,7 @@ resource "aws_security_group" "k3s" {
 resource "aws_instance" "k3s-demo" {
   count = "${var.instance_count}"
   instance_type = "t3.large"
-  ami           = data.aws_ami.ubuntu.id
+  ami           = data.aws_ami.centos7.id
 	key_name      = "hussein"
   security_groups = [
     aws_security_group.k3s.name,

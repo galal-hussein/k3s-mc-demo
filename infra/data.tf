@@ -34,3 +34,13 @@ data "aws_ami" "ubuntu" {
     values = ["x86_64"]
   }
 }
+
+data "aws_ami" "centos7" {
+	owners      = ["aws-marketplace"]
+  most_recent = true
+
+  filter {
+    name   = "product-code"
+    values = ["aw0evgkw8e5c1q413zgy5pjce"]
+  }
+}
